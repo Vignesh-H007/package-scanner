@@ -260,12 +260,11 @@ body {
 }
 
 .hero-card {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("/home/vignesh/Projects/package-ocr/legal-metrology-app/public/hero.png");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("/hero.png");
   color: #fff;
   border-radius: 24px;
   padding: 24px;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
-  background-size: cover;
 }
 
 .hero-pill {
