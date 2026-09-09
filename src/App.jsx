@@ -121,22 +121,43 @@ export default function App() {
         ) : (
           <>
             {currentTab === 'dashboard' && (
+              <>
               <DashboardScreen 
                 inspections={inspections}
                 onStartScan={handleStartScan}
                 onSelectInspection={handleSelectInspection}
               />
+              <BottomNav 
+              currentTab={currentTab} 
+              setCurrentTab={handleTabChange} 
+              onOpenScan={handleStartScan} 
+              />
+              </>
             )}
             {currentTab === 'history' && (
+              <>
               <HistoryScreen 
                 inspections={inspections}
                 onSelectInspection={handleSelectInspection}
               />
+              <BottomNav 
+              currentTab={currentTab} 
+              setCurrentTab={handleTabChange} 
+              onOpenScan={handleStartScan} 
+              />
+              </>
             )}
             {currentTab === 'profile' && (
+              <>
               <ProfileScreen 
                 onLogOut={handleLogOut}
               />
+              <BottomNav 
+              currentTab={currentTab} 
+              setCurrentTab={handleTabChange} 
+              onOpenScan={handleStartScan} 
+              />
+              </>
             )}
           </>
         )}

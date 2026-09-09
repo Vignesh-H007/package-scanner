@@ -13,6 +13,14 @@ export default function BottomNav({ currentTab, setCurrentTab, onOpenScan }) {
           <span>Home</span>
         </button>
 
+         <button
+          onClick={() => setCurrentTab('report')}
+          className={`nav-tab-button ${currentTab === 'report' ? 'active' : ''}`}
+        >
+          <LayoutDashboard size={20} />
+          <span>Reports</span>
+        </button>
+
         <div className="fab-wrapper">
           <button onClick={onOpenScan} aria-label="Scan package" className="scan-fab">
             <ScanLine size={24} />
