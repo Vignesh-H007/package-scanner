@@ -16,11 +16,14 @@ export default function App() {
   const [activeResult, setActiveResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Dynamically uses the laptop's IP when accessed from your phone, or localhost on desktop
+  const API_BASE = `http://${window.location.hostname}:8000`;
+
   // Fetch persistent records on initial launch
   useEffect(() => {
     const fetchStoredInspections = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/inspections");
+        const res = await fetch(`${API_BASE}/api/inspections`);
         if (res.ok) {
           const data = await res.json();
           setInspections(data);
@@ -30,7 +33,7 @@ export default function App() {
       }
     };
     fetchStoredInspections();
-  }, []);
+  }, [API_BASE]);
 
   const handleStartScan = () => {
     setCurrentScreen('upload');
@@ -51,7 +54,7 @@ export default function App() {
       const formData = new FormData();
       formData.append("file", fileToScan);
 
-      const res = await fetch("http://localhost:8000/api/inspect", {
+      const res = await fetch(`${API_BASE}/api/inspect`, {
         method: "POST",
         body: formData,
       });
@@ -78,7 +81,7 @@ export default function App() {
 
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
-    setCurrentScreen(tab);
+    setCurrentScreen('dashboard'); // Keeps user in tab view
   };
 
   const handleLogOut = () => {
@@ -86,6 +89,9 @@ export default function App() {
       alert("Logged out successfully.");
     }
   };
+
+  // BottomNav only displays when on top-level dashboard/history/profile screens
+  const isMainTabScreen = currentScreen === 'dashboard' && !isLoading;
 
   return (
     <div className="app-container">
@@ -121,49 +127,29 @@ export default function App() {
         ) : (
           <>
             {currentTab === 'dashboard' && (
-              <>
               <DashboardScreen 
                 inspections={inspections}
                 onStartScan={handleStartScan}
                 onSelectInspection={handleSelectInspection}
               />
-              <BottomNav 
-              currentTab={currentTab} 
-              setCurrentTab={handleTabChange} 
-              onOpenScan={handleStartScan} 
-              />
-              </>
             )}
             {currentTab === 'history' && (
-              <>
               <HistoryScreen 
                 inspections={inspections}
                 onSelectInspection={handleSelectInspection}
               />
-              <BottomNav 
-              currentTab={currentTab} 
-              setCurrentTab={handleTabChange} 
-              onOpenScan={handleStartScan} 
-              />
-              </>
             )}
             {currentTab === 'profile' && (
-              <>
               <ProfileScreen 
                 onLogOut={handleLogOut}
               />
-              <BottomNav 
-              currentTab={currentTab} 
-              setCurrentTab={handleTabChange} 
-              onOpenScan={handleStartScan} 
-              />
-              </>
             )}
           </>
         )}
       </main>
 
-      {currentScreen === 'dashboard' && (
+      {/* Render single persistent BottomNav on main tabs */}
+      {isMainTabScreen && (
         <BottomNav 
           currentTab={currentTab} 
           setCurrentTab={handleTabChange} 
