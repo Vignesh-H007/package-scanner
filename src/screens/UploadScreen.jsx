@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { ArrowLeft, Camera, Check, UploadCloud, AlertCircle, Play } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { ArrowLeft, Camera, Check, UploadCloud, AlertCircle, Play, FolderOpen } from 'lucide-react';
 
 export default function UploadScreen({ onBack, onRunAnalysis }) {
   const [previews, setPreviews] = useState({
@@ -13,6 +13,17 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
     back: null,
     label: null,
   });
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect whether the device is mobile/tablet
+  useEffect(() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const mobileRegex = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+    const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    setIsMobile(mobileRegex.test(userAgent) || (hasTouchScreen && window.innerWidth < 768));
+  }, []);
 
   const fileInputRefs = {
     front: useRef(null),
@@ -36,17 +47,17 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
   };
 
   const filledCount = Object.values(previews).filter(Boolean).length;
-  const isReady = filledCount >= 1; // Allows running if at least 1 image is provided
+  const isReady = filledCount >= 1; // Enables analysis if at least one view is ready
 
   const handleTriggerAnalysis = () => {
-    // Send the label close-up, back panel, or front panel image in order of priority
+    // Priority order: Label close-up -> Back Panel -> Front Panel
     const fileToScan = files.label || files.back || files.front;
     onRunAnalysis(fileToScan);
   };
 
   return (
     <div>
-      {/* Top Bar */}
+      {/* Top Header Bar */}
       <div className="screen-header-bar">
         <button onClick={onBack} className="back-action-btn">
           <ArrowLeft size={18} />
@@ -59,10 +70,14 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
       {/* Guide Header */}
       <div className="upload-instruction-card">
         <div className="upload-icon-bubble">
-          <UploadCloud size={24} />
+          {isMobile ? <Camera size={24} /> : <UploadCloud size={24} />}
         </div>
-        <h3>Capture 3 Mandatory Angles</h3>
-        <p>Ensure text, MRP, batch number, and net weight are sharp and visible for PCR 2011 rule verification.</p>
+        <h3>{isMobile ? "Capture 3 Package Angles" : "Upload 3 Package Images"}</h3>
+        <p>
+          {isMobile 
+            ? "Tapping a slot opens your device camera. Keep text, MRP, batch number, and net weight in focus."
+            : "Select image files from your computer. Ensure all mandatory metrology markings are clearly legible."}
+        </p>
       </div>
 
       {/* 3-Slot Section */}
@@ -80,7 +95,7 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
           <input 
             type="file" 
             accept="image/*" 
-            capture="environment"
+            capture={isMobile ? "environment" : undefined}
             ref={fileInputRefs.front} 
             onChange={(e) => handleFileChange('front', e)} 
             style={{ display: 'none' }} 
@@ -88,8 +103,10 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
           <div className="slot-preview-box">
             {previews.front ? (
               <img src={previews.front} alt="Front View" />
-            ) : (
+            ) : isMobile ? (
               <Camera size={28} />
+            ) : (
+              <FolderOpen size={28} />
             )}
           </div>
           <p className="slot-label">1. Front Panel</p>
@@ -109,7 +126,7 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
           <input 
             type="file" 
             accept="image/*" 
-            capture="environment"
+            capture={isMobile ? "environment" : undefined}
             ref={fileInputRefs.back} 
             onChange={(e) => handleFileChange('back', e)} 
             style={{ display: 'none' }} 
@@ -117,8 +134,10 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
           <div className="slot-preview-box">
             {previews.back ? (
               <img src={previews.back} alt="Back View" />
-            ) : (
+            ) : isMobile ? (
               <Camera size={28} />
+            ) : (
+              <FolderOpen size={28} />
             )}
           </div>
           <p className="slot-label">2. Back Panel</p>
@@ -138,7 +157,7 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
           <input 
             type="file" 
             accept="image/*" 
-            capture="environment"
+            capture={isMobile ? "environment" : undefined}
             ref={fileInputRefs.label} 
             onChange={(e) => handleFileChange('label', e)} 
             style={{ display: 'none' }} 
@@ -146,8 +165,10 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
           <div className="slot-preview-box">
             {previews.label ? (
               <img src={previews.label} alt="Label Close-up" />
-            ) : (
+            ) : isMobile ? (
               <Camera size={28} />
+            ) : (
+              <FolderOpen size={28} />
             )}
           </div>
           <p className="slot-label">3. Label Close-up</p>
@@ -164,7 +185,9 @@ export default function UploadScreen({ onBack, onRunAnalysis }) {
       <div className="info-notice">
         <AlertCircle size={18} className="info-notice-icon" />
         <p className="info-notice-text">
-          Hold package flat under clear lighting. Both camera snapshots and gallery uploads are accepted.
+          {isMobile
+            ? "Hold camera steady and flat under adequate lighting to ensure sharp OCR character recognition."
+            : "Upload clear PNG or JPG photos without glare or heavy shadows over the declaration labels."}
         </p>
       </div>
 
