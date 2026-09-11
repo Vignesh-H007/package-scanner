@@ -11,7 +11,7 @@ export default function Header({ currentTab, setCurrentTab, officer = { name: "A
             <ShieldCheck size={22} />
           </div>
           <div>
-            <h1 className="brand-title">MetroScan</h1>
+            <h1 className="brand-title">Clix</h1>
             <p className="brand-subtitle">Legal Metrology</p>
           </div>
         </div>
